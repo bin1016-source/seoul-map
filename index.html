@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>응급 의료 구글 지도 시각화</title>
+  <style>
+    html, body, #map {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script>
+    // 병원 좌표 및 가용 상태 데이터 (필요한 병원 데이터를 이 배열에 추가하세요)
+    const hospitals = [
+      {
+        name: "서울대학교병원",
+        addr: "서울특별시 종로구 대학로 101",
+        lat: 37.5798,
+        lng: 126.9990,
+        available: true,
+        status: "수용 가능"
+      },
+      {
+        name: "강북삼성병원",
+        addr: "서울특별시 종로구 새문안로 29",
+        lat: 37.5681,
+        lng: 126.9680,
+        available: false,
+        status: "수용 곤란"
+      },
+      {
+        name: "세브란스병원",
+        addr: "서울특별시 서대문구 연세로 50-1",
+        lat: 37.5621,
+        lng: 126.9407,
+        available: true,
+        status: "수용 가능"
+      }
+    ];
+
+    function initMap() {
+      const map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 37.5450, lng: 126.9850 },
+        zoom: 12,
+        mapTypeId: "roadmap"
+      });
+
+      const infoWindow = new google.maps.InfoWindow();
+
+      hospitals.forEach((h) => {
+        const position = { lat: h.lat, lng: h.lng };
+
+        const marker = new google.maps.Marker({
+          position: position,
+          map: map,
+          title: h.name,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 9,
+            fillColor: h.available ? "#16a34a" : "#dc2626",
+            fillOpacity: 0.95,
+            strokeColor: "#ffffff",
+            strokeWeight: 2
+          }
+        });
+
+        new google.maps.Circle({
+          map: map,
+          center: position,
+          radius: 3000,
+          strokeColor: "#2563eb",
+          strokeOpacity: 0.75,
+          strokeWeight: 1.5,
+          fillColor: "#3b82f6",
+          fillOpacity: 0.08
+        });
+
+        marker.addListener("click", () => {
+          infoWindow.setContent(
+            `<div style="font-family: sans-serif; min-width: 180px;">
+              <strong>${h.name}</strong><br/>
+              <span style="font-size: 12px; color: #555;">${h.addr}</span><br/>
+              <hr style="margin: 6px 0;"/>
+              <span style="font-size: 12px;">상태: <b>${h.status}</b></span>
+            </div>`
+          );
+          infoWindow.open(map, marker);
+        });
+      });
+    }
+  </script>
+
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABcEAcrT5m7PvlYzNsD3fl4BEnCsk0V6k&callback=initMap"
+    async
+    defer
+  ></script>
+</body>
+</html>
